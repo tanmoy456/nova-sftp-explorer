@@ -2,6 +2,7 @@ import io
 import json
 import os
 import stat
+import sys
 import threading
 import tkinter as tk
 from dataclasses import asdict
@@ -25,6 +26,7 @@ TEXT_PREVIEW_LIMIT = 256 * 1024
 HEX_PREVIEW_LIMIT = 32 * 1024
 IMAGE_PREVIEW_LIMIT = 8 * 1024 * 1024
 SETTINGS_FILE = "nova_state.json"
+APP_DIR_NAME = "nova-sftp-explorer"
 
 
 class NovaSFTPExplorer(ctk.CTk):
@@ -57,7 +59,7 @@ class NovaSFTPExplorer(ctk.CTk):
         self.transfer_counter = 0
         self.transfer_rows = {}
 
-        self.state_path = Path(__file__).with_name(SETTINGS_FILE)
+        self.state_path = self._resolve_state_path()
         self.profiles = []
         self.bookmarks = []
         self.ui_prefs = {}
@@ -333,6 +335,23 @@ class NovaSFTPExplorer(ctk.CTk):
         self.status_var.set(text)
 
     # State
+    def _resolve_state_path(self) -> Path:
+        appdata = os.getenv("APPDATA")
+        if appdata:
+            base = Path(appdata)
+        elif os.name == "nt":
+            base = Path.home() / "AppData" / "Roaming"
+        elif os.getenv("XDG_CONFIG_HOME"):
+            base = Path(os.getenv("XDG_CONFIG_HOME", ""))
+        elif sys.platform == "darwin":
+            base = Path.home() / "Library" / "Application Support"
+        else:
+            base = Path.home() / ".config"
+
+        state_dir = base / APP_DIR_NAME
+        state_dir.mkdir(parents=True, exist_ok=True)
+        return state_dir / SETTINGS_FILE
+
     def _load_state(self):
         if not self.state_path.exists():
             return
