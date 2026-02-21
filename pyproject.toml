@@ -35,9 +35,9 @@ dependencies = [
 nova-sftp-explorer = "sftp:main"
 
 [project.urls]
-Homepage = "https://github.com/tanmoy/nova-sftp-explorer"
-Repository = "https://github.com/tanmoy/nova-sftp-explorer"
-Issues = "https://github.com/tanmoy/nova-sftp-explorer/issues"
+Homepage = "https://github.com/tanmoy456/nova-sftp-explorer"
+Repository = "https://github.com/tanmoy456/nova-sftp-explorer"
+Issues = "https://github.com/tanmoy456/nova-sftp-explorer/issues"
 
 [tool.setuptools]
 py-modules = ["sftp", "ui", "preview", "sftp_client"]
