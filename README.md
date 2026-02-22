@@ -4,6 +4,10 @@ A modern, cross-platform SFTP desktop explorer focused on **remote-first file in
 
 **Current version:** `0.1.2`
 
+## Screenshot
+
+![Nova SFTP Explorer main window](assets/screenshots/nova-sftp-explorer-main.png)
+
 ## Why Nova SFTP Explorer
 
 Most SFTP clients are optimized for transfers. Nova is optimized for fast remote inspection:
