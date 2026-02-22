@@ -52,6 +52,12 @@ pip install nova-sftp-explorer
 nova-sftp-explorer
 ```
 
+## Upgrade
+
+```bash
+python3 -m pip install -U nova-sftp-explorer
+```
+
 ## Platform Notes
 
 - Python `>=3.10`
