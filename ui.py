@@ -32,6 +32,8 @@ APP_DIR_NAME = "nova-sftp-explorer"
 class NovaSFTPExplorer(ctk.CTk):
     def __init__(self):
         super().__init__()
+        self.ui_font_family, self.mono_font_family = self._platform_fonts()
+        self._configure_display_scaling()
         self.title("Nova SFTP Explorer")
         self.geometry("1400x900")
         self.protocol("WM_DELETE_WINDOW", self._on_close)
@@ -73,6 +75,38 @@ class NovaSFTPExplorer(ctk.CTk):
         self._refresh_profile_menu()
         self._apply_ui_prefs()
 
+    @staticmethod
+    def _platform_fonts():
+        if sys.platform == "darwin":
+            return "SF Pro Text", "Menlo"
+        if os.name == "nt":
+            return "Segoe UI", "Consolas"
+        return "DejaVu Sans", "DejaVu Sans Mono"
+
+    def _configure_display_scaling(self):
+        # Linux + Tk can render blurry with fractional desktop scaling.
+        # Allow override via NOVA_SFTP_SCALING; default to 1.0 on Linux.
+        raw = os.getenv("NOVA_SFTP_SCALING")
+        if raw is None and sys.platform.startswith("linux"):
+            raw = "1.0"
+        if not raw:
+            return
+        try:
+            scale = float(raw)
+        except ValueError:
+            return
+        if scale <= 0:
+            return
+        try:
+            self.tk.call("tk", "scaling", scale)
+        except Exception:
+            pass
+        try:
+            ctk.set_window_scaling(scale)
+            ctk.set_widget_scaling(scale)
+        except Exception:
+            pass
+
     def _setup_layout(self):
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(1, weight=1)
@@ -85,7 +119,7 @@ class NovaSFTPExplorer(ctk.CTk):
         ctk.CTkLabel(
             self.toolbar,
             text="NOVA SFTP EXPLORER",
-            font=ctk.CTkFont(size=20, weight="bold"),
+            font=ctk.CTkFont(family=self.ui_font_family, size=20, weight="bold"),
         ).grid(row=0, column=0, padx=16, pady=(10, 8), sticky="w")
 
         connect_row = ctk.CTkFrame(self.toolbar, fg_color="transparent")
@@ -158,7 +192,11 @@ class NovaSFTPExplorer(ctk.CTk):
         header.grid(row=0, column=0, sticky="ew", padx=10, pady=(8, 0))
         header.grid_columnconfigure(1, weight=1)
 
-        ctk.CTkLabel(header, text="Remote Browser", font=ctk.CTkFont(size=18, weight="bold")).grid(row=0, column=0, sticky="w", padx=(2, 8))
+        ctk.CTkLabel(
+            header,
+            text="Remote Browser",
+            font=ctk.CTkFont(family=self.ui_font_family, size=18, weight="bold"),
+        ).grid(row=0, column=0, sticky="w", padx=(2, 8))
 
         self.search_entry = ctk.CTkEntry(header, placeholder_text="Filter files...")
         self.search_entry.grid(row=0, column=1, sticky="ew", padx=(0, 8))
@@ -194,7 +232,14 @@ class NovaSFTPExplorer(ctk.CTk):
         style.theme_use("default")
         style.configure("SFTP.Treeview", background="#17212b", foreground="#e6edf6", fieldbackground="#17212b", borderwidth=0, rowheight=30)
         style.map("SFTP.Treeview", background=[("selected", "#245f91")])
-        style.configure("SFTP.Treeview.Heading", background="#0f1720", foreground="#e6edf6", relief="flat", borderwidth=0, font=("SF Pro Text", 12, "bold"))
+        style.configure(
+            "SFTP.Treeview.Heading",
+            background="#0f1720",
+            foreground="#e6edf6",
+            relief="flat",
+            borderwidth=0,
+            font=(self.ui_font_family, 12, "bold"),
+        )
         style.map(
             "SFTP.Treeview.Heading",
             background=[("active", "#0f1720"), ("pressed", "#0f1720")],
@@ -231,7 +276,11 @@ class NovaSFTPExplorer(ctk.CTk):
         self.preview_panel.grid_rowconfigure(1, weight=1)
         self.preview_panel.grid_columnconfigure(0, weight=1)
 
-        ctk.CTkLabel(self.preview_panel, text="Instant Remote Preview", font=ctk.CTkFont(size=18, weight="bold")).grid(row=0, column=0, sticky="w", padx=12, pady=(10, 0))
+        ctk.CTkLabel(
+            self.preview_panel,
+            text="Instant Remote Preview",
+            font=ctk.CTkFont(family=self.ui_font_family, size=18, weight="bold"),
+        ).grid(row=0, column=0, sticky="w", padx=12, pady=(10, 0))
 
         self.preview_tabs = ctk.CTkTabview(self.preview_panel)
         self.preview_tabs.grid(row=1, column=0, sticky="nsew", padx=10, pady=10)
@@ -251,7 +300,7 @@ class NovaSFTPExplorer(ctk.CTk):
         self.page_label.pack(side="left", padx=10)
         self.btn_next_page.pack(side="left")
 
-        self.text_preview = ctk.CTkTextbox(self.tab_text, font=("JetBrains Mono", 13))
+        self.text_preview = ctk.CTkTextbox(self.tab_text, font=(self.mono_font_family, 13))
         self.text_preview.pack(fill="both", expand=True, padx=8, pady=8)
 
         self.image_controls = ctk.CTkFrame(self.tab_image, fg_color="transparent")
@@ -296,10 +345,10 @@ class NovaSFTPExplorer(ctk.CTk):
         self.image_canvas.bind("<B1-Motion>", self._on_image_pan_move)
         self.image_canvas.create_text(20, 20, anchor="nw", text="Select an image file to preview", fill="#c9d2df", tags=("placeholder",))
 
-        self.hex_preview = ctk.CTkTextbox(self.tab_hex, font=("JetBrains Mono", 12))
+        self.hex_preview = ctk.CTkTextbox(self.tab_hex, font=(self.mono_font_family, 12))
         self.hex_preview.pack(fill="both", expand=True, padx=8, pady=8)
 
-        self.meta_preview = ctk.CTkTextbox(self.tab_meta, font=("JetBrains Mono", 12))
+        self.meta_preview = ctk.CTkTextbox(self.tab_meta, font=(self.mono_font_family, 12))
         self.meta_preview.pack(fill="both", expand=True, padx=8, pady=8)
 
         self._setup_transfer_table()
