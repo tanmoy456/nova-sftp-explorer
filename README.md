@@ -2,7 +2,7 @@
 
 A modern, cross-platform SFTP desktop explorer focused on **remote-first file inspection**.
 
-**Current version:** `0.1.2`
+**Current version:** `0.1.3`
 
 ## Screenshot
 
