@@ -6,7 +6,7 @@ A modern, cross-platform SFTP desktop explorer focused on **remote-first file in
 
 ## Screenshot
 
-![Nova SFTP Explorer main window](assets/screenshots/nova-sftp-explorer-main.png)
+![Nova SFTP Explorer main window](https://raw.githubusercontent.com/tanmoy456/nova-sftp-explorer/main/assets/screenshots/nova-sftp-explorer-main.png)
 
 ## Why Nova SFTP Explorer
 
